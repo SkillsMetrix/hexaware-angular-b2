@@ -1,0 +1,23 @@
+
+<ul>
+    <li *ngFor="let user of users">
+            {{user}}
+    </li>
+</ul>
+
+
+
+      -----------
+
+      import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrl: './header.component.css'
+})
+export class HeaderComponent {
+
+  users=['admin','manager','qa']
+
+}
