@@ -1,23 +1,59 @@
-
-<ul>
-    <li *ngFor="let user of users">
-            {{user}}
-    </li>
-</ul>
-
-
-
-      -----------
-
-      import { Component } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrl: './header.component.css'
+  selector: 'app-footer',
+  templateUrl: './footer.component.html',
+  styleUrl: './footer.component.css',
 })
-export class HeaderComponent {
-
-  users=['admin','manager','qa']
-
+export class FooterComponent {
+  mycity = 'NY';
+  pp =
+    'https://plus.unsplash.com/premium_photo-1689568126014-06fea9d5d341?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000';
+  addUser() {
+    alert('user added');
+  }
+  people = [
+    {
+      name: 'Adam',
+      country: 'Australia',
+    },
+    {
+      name: 'Sam',
+      country: 'USA',
+    },
+    {
+      name: 'Chitra',
+      country: 'India',
+    },
+  ];
+  getColor(country: string) {
+    switch (country) {
+      case 'Australia':
+        return 'blue';
+      case 'USA':
+        return 'green';
+      case 'India':
+        return 'purple';
+      default:
+        return null;
+    }
+  }
 }
+------------
+
+
+MyCity: <input type="text" [(ngModel)]='mycity'/>
+{{mycity}}
+
+Profile: <img [src]="pp" width="100" height="100"/>
+
+<button (click)="addUser()">Add</button>
+
+<hr>
+
+<p> Dynamic Style</p>
+
+<ul *ngFor="let person of people">
+    <li [ngStyle]="{'color':getColor(person.country)}">{{person.name}}-- {{person.country}}</li>
+</ul>
+
