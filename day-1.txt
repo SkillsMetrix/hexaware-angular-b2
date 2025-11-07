@@ -1,59 +1,48 @@
-import { Component } from '@angular/core';
+<app-header></app-header>
+<p>mainapp works!</p>
+<app-footer [mycity]="newcity"></app-footer>
 
-@Component({
-  selector: 'app-footer',
-  templateUrl: './footer.component.html',
-  styleUrl: './footer.component.css',
-})
-export class FooterComponent {
-  mycity = 'NY';
-  pp =
-    'https://plus.unsplash.com/premium_photo-1689568126014-06fea9d5d341?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZXxlbnwwfHwwfHx8MA%3D%3D&fm=jpg&q=60&w=3000';
-  addUser() {
-    alert('user added');
-  }
-  people = [
-    {
-      name: 'Adam',
-      country: 'Australia',
-    },
-    {
-      name: 'Sam',
-      country: 'USA',
-    },
-    {
-      name: 'Chitra',
-      country: 'India',
-    },
-  ];
-  getColor(country: string) {
-    switch (country) {
-      case 'Australia':
-        return 'blue';
-      case 'USA':
-        return 'green';
-      case 'India':
-        return 'purple';
-      default:
-        return null;
-    }
-  }
-}
-------------
-
-
-MyCity: <input type="text" [(ngModel)]='mycity'/>
-{{mycity}}
-
-Profile: <img [src]="pp" width="100" height="100"/>
-
-<button (click)="addUser()">Add</button>
 
 <hr>
+<app-calc></app-calc>
 
-<p> Dynamic Style</p>
+<button (click)="inc()">INC</button>
 
-<ul *ngFor="let person of people">
-    <li [ngStyle]="{'color':getColor(person.country)}">{{person.name}}-- {{person.country}}</li>
-</ul>
+<button (click)="dec()">DEC</button>
 
+<p>Conditional using hidden</p>
+
+<div [hidden]="shopCart.length ==0">Items in your cart</div>
+
+<div [hidden]="shopCart.length > 0">NO Item Found</div>
+
+
+<p>Conditional using ngIf</p>
+
+<div *ngIf="shopCart.length > 0">Items in your cart</div>
+
+<div *ngIf="shopCart.length == 0">NO Item Found</div>
+
+<p>Conditional using ngTemplate</p>
+
+<div *ngIf="shopCart.length > 0; then show else noshow"></div>
+
+<ng-template #show>Items in your cart</ng-template>
+
+<ng-template #noshow>NO Items found</ng-template>
+
+
+
+<p>Conditional using IF new</p>
+
+@if (shopCart.length > 0) {
+    <div>Items in your cart</div>
+}@else {
+    <div>NO Item Found</div>
+}
+
+@for (item of shopCart; track item) {
+    <p>{{item}}</p>
+}@empty {
+    <p>NO Items Found</p>
+}
