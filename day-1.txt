@@ -1,48 +1,67 @@
-<app-header></app-header>
-<p>mainapp works!</p>
-<app-footer [mycity]="newcity"></app-footer>
+<div id="uform">
+
+  <mat-card style="width: 350px; padding: 20px;">
+    <mat-card-header>
+      <mat-card-title>User Registration Form</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="addUser(data)" #data="ngForm">
+        <mat-form-field appearance="outline">
+          <mat-label>UserName</mat-label>
+          <input matInput type="text" name="uname" ngModel #un="ngModel" required />
+
+          <mat-error *ngIf="un.invalid && (un.dirty || un.touched)">
+            <div *ngIf="un.errors?.['required']">UserName cant be empty</div>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" name="pass" ngModel #pass=ngModel required minlength="6" />
+
+          <mat-error *ngIf="pass.invalid && (pass.dirty || pass.touched)">
+
+            <div *ngIf="pass.errors?.['required']"> Field cant be Empty</div>
+            <div *ngIf="pass.errors?.['minlength']"> password must be 6 char long</div>
+
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input matInput type="email" name="email" ngModel #em=ngModel required email />
+          <mat-error *ngIf="em.invalid && (em.dirty || em.touched)">
+
+            <div *ngIf="em.errors?.['required']"> Field cant be Empty</div>
+            <div *ngIf="em.errors?.['email']">Email must be formatted</div>
+
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>City</mat-label>
+          <input matInput type="text" name="city" ngModel />
+        </mat-form-field>
+        <button mat-raised-button color="primary">Register</button>
 
 
-<hr>
-<app-calc></app-calc>
-
-<button (click)="inc()">INC</button>
-
-<button (click)="dec()">DEC</button>
-
-<p>Conditional using hidden</p>
-
-<div [hidden]="shopCart.length ==0">Items in your cart</div>
-
-<div [hidden]="shopCart.length > 0">NO Item Found</div>
-
-
-<p>Conditional using ngIf</p>
-
-<div *ngIf="shopCart.length > 0">Items in your cart</div>
-
-<div *ngIf="shopCart.length == 0">NO Item Found</div>
-
-<p>Conditional using ngTemplate</p>
-
-<div *ngIf="shopCart.length > 0; then show else noshow"></div>
-
-<ng-template #show>Items in your cart</ng-template>
-
-<ng-template #noshow>NO Items found</ng-template>
+      </form>
+    </mat-card-content>
+  </mat-card>
 
 
 
-<p>Conditional using IF new</p>
 
-@if (shopCart.length > 0) {
-    <div>Items in your cart</div>
-}@else {
-    <div>NO Item Found</div>
-}
 
-@for (item of shopCart; track item) {
-    <p>{{item}}</p>
-}@empty {
-    <p>NO Items Found</p>
+</div>
+
+
+----------
+
+
+#uform {
+    max-width: 300px;
+    margin: 50px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
 }
