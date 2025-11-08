@@ -5,18 +5,18 @@
       <mat-card-title>User Registration Form</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <form (ngSubmit)="addUser(data)" #data="ngForm">
+      <form (ngSubmit)="addUser()" [formGroup]="myForm">
         <mat-form-field appearance="outline">
           <mat-label>UserName</mat-label>
-          <input matInput type="text" name="uname" ngModel #un="ngModel" required />
+          <input matInput type="text" formControlName="uname"/>
 
-          <mat-error *ngIf="un.invalid && (un.dirty || un.touched)">
-            <div *ngIf="un.errors?.['required']">UserName cant be empty</div>
+          <mat-error *ngIf="uname.invalid && (uname.dirty || uname.touched)">
+            <div *ngIf="uname.errors?.['required']">UserName cant be empty</div>
           </mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline">
           <mat-label>Password</mat-label>
-          <input matInput type="password" name="pass" ngModel #pass=ngModel required minlength="6" />
+          <input matInput type="password" formControlName="pass" />
 
           <mat-error *ngIf="pass.invalid && (pass.dirty || pass.touched)">
 
@@ -28,17 +28,17 @@
 
         <mat-form-field>
           <mat-label>Email</mat-label>
-          <input matInput type="email" name="email" ngModel #em=ngModel required email />
-          <mat-error *ngIf="em.invalid && (em.dirty || em.touched)">
+          <input matInput type="email" formControlName="email" />
+          <mat-error *ngIf="email.invalid && (email.dirty || email.touched)">
 
-            <div *ngIf="em.errors?.['required']"> Field cant be Empty</div>
-            <div *ngIf="em.errors?.['email']">Email must be formatted</div>
+            <div *ngIf="email.errors?.['required']"> Field cant be Empty</div>
+            <div *ngIf="email.errors?.['email']">Email must be formatted</div>
 
           </mat-error>
         </mat-form-field>
         <mat-form-field>
           <mat-label>City</mat-label>
-          <input matInput type="text" name="city" ngModel />
+          <input matInput type="text" formControlName="city"/>
         </mat-form-field>
         <button mat-raised-button color="primary">Register</button>
 
@@ -46,22 +46,51 @@
       </form>
     </mat-card-content>
   </mat-card>
+---------------------
+
+import { Component } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
+
+@Component({
+  selector: 'app-dd',
+  templateUrl: './dd.component.html',
+  styleUrl: './dd.component.css'
+})
+export class DdComponent {
+
+  myForm!:FormGroup
+  uname!: FormControl
+  pass!: FormControl
+  email!: FormControl
+  city!: FormControl
+
+  createForm(){
+    this.myForm= new FormGroup({
+      uname:this.uname,
+      pass: this.pass,
+      email:this.email,
+      city:this.city
+    })
+  }
+  createFormControl(){
+    this.uname= new FormControl('')
+        this.pass= new FormControl('')
+            this.email= new FormControl('')
+                this.city= new FormControl('')
+  }
+constructor(){
+  this.createFormControl()
+  this.createForm()
+}
+  addUser(){
+    console.log('user is added');
+    
+  }
+
+}
 
 
 
 
 
 </div>
-
-
-----------
-
-
-#uform {
-    max-width: 300px;
-    margin: 50px auto;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-
-}
