@@ -1,6 +1,18 @@
+
+export const ValidationMessages: {[key:string]: {[key:string]:string}}={
+    uname:{
+        required: 'UserName is required'
+
+    }
+}
+--------
+
+
 import { Component } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
  import { UserformserviceService } from '../../shared/userformservice.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ValidationMessages } from '../../shared/error-messages';
 
 @Component({
   selector: 'app-dd',
@@ -29,16 +41,33 @@ export class DdComponent {
             this.email= new FormControl('',[this.emailDomainValidator])
                 this.city= new FormControl('')
   }
-constructor(private us:UserformserviceService){
+constructor(private us:UserformserviceService,private sb:MatSnackBar){
   this.createFormControl()
   this.createForm()
 }
   addUser(){
-     
+     this.sb.open('Record Saved...!', 'close',{
+      duration: 3000,
+      horizontalPosition:'center',
+      verticalPosition:'top',
+      panelClass: ['success-snackbar']
+     })
     this.us.addUserToDB(this.myForm.value)
     
   }
 
+  getErrorMessage(controlName: string):string | null{
+    const control= this.myForm.get(controlName)
+    if( control && control.errors){
+      const errors= control.errors
+      for( const errorName in errors){
+        if(ValidationMessages[controlName][errorName]){
+          return ValidationMessages[controlName][errorName]
+        }
+      }
+    }
+    return null
+  }
   emailDomainValidator(control:FormControl){
     let email= control.value
     if(email && email.indexOf('@') !=-1){
@@ -55,7 +84,10 @@ constructor(private us:UserformserviceService){
   }
 
 }
-------
+
+
+----------
+
 <div id="uform">
 
   <mat-card style="width: 350px; padding: 20px;">
@@ -69,7 +101,7 @@ constructor(private us:UserformserviceService){
           <input matInput type="text" formControlName="uname"/>
 
           <mat-error *ngIf="uname.invalid && (uname.dirty || uname.touched)">
-            <div *ngIf="uname.errors?.['required']">UserName cant be empty</div>
+                              {{getErrorMessage('uname')}}
           </mat-error>
         </mat-form-field>
         <mat-form-field appearance="outline">
