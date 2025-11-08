@@ -1,3 +1,61 @@
+import { Component } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+ import { UserformserviceService } from '../../shared/userformservice.service';
+
+@Component({
+  selector: 'app-dd',
+  templateUrl: './dd.component.html',
+  styleUrl: './dd.component.css'
+})
+export class DdComponent {
+
+  myForm!:FormGroup
+  uname!: FormControl
+  pass!: FormControl
+  email!: FormControl
+  city!: FormControl
+
+  createForm(){
+    this.myForm= new FormGroup({
+      uname:this.uname,
+      pass: this.pass,
+      email:this.email,
+      city:this.city
+    })
+  }
+  createFormControl(){
+    this.uname= new FormControl('',Validators.required)
+        this.pass= new FormControl('',[Validators.required,Validators.minLength(6)])
+            this.email= new FormControl('',[this.emailDomainValidator])
+                this.city= new FormControl('')
+  }
+constructor(private us:UserformserviceService){
+  this.createFormControl()
+  this.createForm()
+}
+  addUser(){
+     
+    this.us.addUserToDB(this.myForm.value)
+    
+  }
+
+  emailDomainValidator(control:FormControl){
+    let email= control.value
+    if(email && email.indexOf('@') !=-1){
+      let [before,domain]= email.split('@')
+      if(domain !='hexaware.com'){
+        return {
+          emailDomain:{
+            pd:domain
+          }
+        }
+      }
+    }
+    return null
+  }
+
+}
+------
 <div id="uform">
 
   <mat-card style="width: 350px; padding: 20px;">
@@ -32,7 +90,7 @@
           <mat-error *ngIf="email.invalid && (email.dirty || email.touched)">
 
             <div *ngIf="email.errors?.['required']"> Field cant be Empty</div>
-            <div *ngIf="email.errors?.['email']">Email must be formatted</div>
+            <div *ngIf="email.errors?.['emailDomain']">Email must be hexaware.com</div>
 
           </mat-error>
         </mat-form-field>
@@ -40,54 +98,12 @@
           <mat-label>City</mat-label>
           <input matInput type="text" formControlName="city"/>
         </mat-form-field>
-        <button mat-raised-button color="primary">Register</button>
+        <button [disabled]="myForm.invalid" mat-raised-button color="primary">Register</button>
 
 
       </form>
     </mat-card-content>
   </mat-card>
----------------------
-
-import { Component } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
-
-@Component({
-  selector: 'app-dd',
-  templateUrl: './dd.component.html',
-  styleUrl: './dd.component.css'
-})
-export class DdComponent {
-
-  myForm!:FormGroup
-  uname!: FormControl
-  pass!: FormControl
-  email!: FormControl
-  city!: FormControl
-
-  createForm(){
-    this.myForm= new FormGroup({
-      uname:this.uname,
-      pass: this.pass,
-      email:this.email,
-      city:this.city
-    })
-  }
-  createFormControl(){
-    this.uname= new FormControl('')
-        this.pass= new FormControl('')
-            this.email= new FormControl('')
-                this.city= new FormControl('')
-  }
-constructor(){
-  this.createFormControl()
-  this.createForm()
-}
-  addUser(){
-    console.log('user is added');
-    
-  }
-
-}
 
 
 
