@@ -1,144 +1,90 @@
-
-export const ValidationMessages: {[key:string]: {[key:string]:string}}={
-    uname:{
-        required: 'UserName is required'
-
-    }
-}
---------
-
-
-import { Component } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
- import { UserformserviceService } from '../../shared/userformservice.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { ValidationMessages } from '../../shared/error-messages';
+import { Component, OnInit } from '@angular/core';
+import { UserformserviceService } from '../../shared/userformservice.service';
 
 @Component({
-  selector: 'app-dd',
-  templateUrl: './dd.component.html',
-  styleUrl: './dd.component.css'
+  selector: 'app-loadusers',
+  templateUrl: './loadusers.component.html',
+  styleUrl: './loadusers.component.css'
 })
-export class DdComponent {
+export class LoadusersComponent implements OnInit{
 
-  myForm!:FormGroup
-  uname!: FormControl
-  pass!: FormControl
-  email!: FormControl
-  city!: FormControl
+  constructor(private us:UserformserviceService){}
 
-  createForm(){
-    this.myForm= new FormGroup({
-      uname:this.uname,
-      pass: this.pass,
-      email:this.email,
-      city:this.city
+  ngOnInit(): void {
+    this.loadUsers()
+  }
+  displayColumns:string[]=['uname','email','city']
+  users:any
+  loadUsers(){
+    this.us.loadUserFromDB().subscribe({
+      next: (res) => (this.users=res)
     })
   }
-  createFormControl(){
-    this.uname= new FormControl('',Validators.required)
-        this.pass= new FormControl('',[Validators.required,Validators.minLength(6)])
-            this.email= new FormControl('',[this.emailDomainValidator])
-                this.city= new FormControl('')
-  }
-constructor(private us:UserformserviceService,private sb:MatSnackBar){
-  this.createFormControl()
-  this.createForm()
+
 }
-  addUser(){
-     this.sb.open('Record Saved...!', 'close',{
-      duration: 3000,
-      horizontalPosition:'center',
-      verticalPosition:'top',
-      panelClass: ['success-snackbar']
-     })
-    this.us.addUserToDB(this.myForm.value)
-    
-  }
+----
 
-  getErrorMessage(controlName: string):string | null{
-    const control= this.myForm.get(controlName)
-    if( control && control.errors){
-      const errors= control.errors
-      for( const errorName in errors){
-        if(ValidationMessages[controlName][errorName]){
-          return ValidationMessages[controlName][errorName]
-        }
-      }
-    }
-    return null
-  }
-  emailDomainValidator(control:FormControl){
-    let email= control.value
-    if(email && email.indexOf('@') !=-1){
-      let [before,domain]= email.split('@')
-      if(domain !='hexaware.com'){
-        return {
-          emailDomain:{
-            pd:domain
-          }
-        }
-      }
-    }
-    return null
-  }
 
+.page-container{
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.user-card{
+    width: 600px;
+    padding: 16px;
+    text-align: center;
+}
+.table-container{
+    overflow-x: auto;
+    margin-top: 16px;
+}
+.compact-table{
+    width: 100%;
+    border-collapse: collapse;
+}
+.compact-table th,
+.compact-table td{
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+.compact-table th{
+    background-color: pink;
+    font-weight: 600;
 }
 
 
-----------
-
-<div id="uform">
-
-  <mat-card style="width: 350px; padding: 20px;">
-    <mat-card-header>
-      <mat-card-title>User Registration Form</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form (ngSubmit)="addUser()" [formGroup]="myForm">
-        <mat-form-field appearance="outline">
-          <mat-label>UserName</mat-label>
-          <input matInput type="text" formControlName="uname"/>
-
-          <mat-error *ngIf="uname.invalid && (uname.dirty || uname.touched)">
-                              {{getErrorMessage('uname')}}
-          </mat-error>
-        </mat-form-field>
-        <mat-form-field appearance="outline">
-          <mat-label>Password</mat-label>
-          <input matInput type="password" formControlName="pass" />
-
-          <mat-error *ngIf="pass.invalid && (pass.dirty || pass.touched)">
-
-            <div *ngIf="pass.errors?.['required']"> Field cant be Empty</div>
-            <div *ngIf="pass.errors?.['minlength']"> password must be 6 char long</div>
-
-          </mat-error>
-        </mat-form-field>
-
-        <mat-form-field>
-          <mat-label>Email</mat-label>
-          <input matInput type="email" formControlName="email" />
-          <mat-error *ngIf="email.invalid && (email.dirty || email.touched)">
-
-            <div *ngIf="email.errors?.['required']"> Field cant be Empty</div>
-            <div *ngIf="email.errors?.['emailDomain']">Email must be hexaware.com</div>
-
-          </mat-error>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>City</mat-label>
-          <input matInput type="text" formControlName="city"/>
-        </mat-form-field>
-        <button [disabled]="myForm.invalid" mat-raised-button color="primary">Register</button>
+---------
 
 
-      </form>
-    </mat-card-content>
-  </mat-card>
+<div class="page-container">
+<mat-card class="user-card mat elevation-z4">
+    <mat-card-title>User List</mat-card-title>
+    <div class="table-container">
+        <table mat-table [dataSource]="users" class="compact-table">
+            <ng-container matColumnDef="uname">
+                <th mat-header-cell *matHeaderCellDef>User Name</th>
+                <td mat-cell *matCellDef="let user">{{user.uname}}</td>
+            </ng-container>
+
+              <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef>Email</th>
+                <td mat-cell *matCellDef="let user">{{user.email}}</td>
+            </ng-container>
 
 
+                    <ng-container matColumnDef="city">
+                <th mat-header-cell *matHeaderCellDef>City</th>
+                <td mat-cell *matCellDef="let user">{{user.city}}</td>
+            </ng-container>
 
-
-
+                <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>
+                <tr mat-header-row *matRowDef="let row; columns: displayColumns"></tr>
+        </table>
+    </div>
+</mat-card>
 </div>
