@@ -8,37 +8,78 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   styleUrl: './edituser.component.css',
 })
 export class EdituserComponent implements OnInit {
+  ngOnInit(): void {
+    if (this.data) {
+      this.form.patchValue({
+        uname: this.data.uname,
+        pass: this.data.pass,
+        email: this.data.email,
+        city: this.data.city,
+      });
+      console.log(this.form.value);
+    }
+  }
+  form: FormGroup;
   constructor(
     private fb: FormBuilder,
     private dr: MatDialogRef<EdituserComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    this.form= this.fb.group({
+    console.log('Dialog Data ', this.data);
+
+    this.form = this.fb.group({
       uname: [this.data.uname],
-       pass: [this.data.pass],
-        email: [this.data.email],
-         city: [this.data.city],
-    })
-  }
-  save(){
+      pass: [this.data.pass],
+      email: [this.data.email],
+      city: [this.data.city],
+    });
     console.log(this.form.value);
-    
   }
-  form: FormGroup;
-  ngOnInit(): void {
-    if (this.data) {
-      this.form.patchValue({
-        uname: this.uname,
-        pass: this.pass,
-        email: this.email,
-        city: this.city,
-      });
-      console.log(this.form.value);
-    }
+  save() {
+    console.log(this.form.value);
   }
-  myForm!: FormGroup;
-  uname!: FormControl;
-  pass!: FormControl;
-  email!: FormControl;
-  city!: FormControl;
 }
+----------
+
+
+<div id="uform">
+
+  <mat-card style="width: 350px; padding: 20px;">
+    <mat-card-header>
+      <mat-card-title>User Registration Form</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="save()" [formGroup]="form">
+        <mat-form-field appearance="outline">
+          <mat-label>UserName</mat-label>
+          <input matInput type="text" formControlName="uname"/>
+
+          
+        </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput type="password" formControlName="pass" />
+
+          
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" />
+          
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>City</mat-label>
+          <input matInput type="text" formControlName="city"/>
+        </mat-form-field>
+        <button mat-raised-button color="primary">Register</button>
+
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+
+<hr>
+
+</div>
