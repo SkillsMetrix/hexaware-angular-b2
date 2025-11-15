@@ -1,13 +1,10 @@
-<header>
-    <div class="navbar navbar-dark bg-primary shadow-sm">
-        <div class="navbar-brand align-item-center d-flex">
-            <i style="font-size: 40px;" class="fas fa-shipping-fast" >
-                &nbsp;
-            </i>
-            <strong style="font-size: 30px;">ShopCart</strong>
-            <div class="form-group">
-                <input type="text" class="form-control" placeholder="search product">
-            </div>
-        </div>
-    </div>
-</header>
+.card-top{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    word-wrap: break-word;
+    background-clip: border-box;
+    border: lightcoral;
+    border-radius: .25rem;
+}
