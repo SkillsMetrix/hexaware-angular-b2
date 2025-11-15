@@ -1,76 +1,38 @@
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { Logger } from './shared/logger.interceptors';
-
-@NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,HttpClientModule
-  ],
-  providers: [
-    {provide:HTTP_INTERCEPTORS,useClass: Logger,multi:true}
-  ],
-  bootstrap: [AppComponent]
-})
-export class AppModule { }
-
------
-
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class OrderService {
-
-  constructor(private http:HttpClient) { }
-
-  loadData(){
-    this.http.get('https://jsonplaceholder.typicode.com/users').subscribe(data => console.log(data)
-    )
-  }
-}
-
-----
-
-import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http";
+import { HttpInterceptor, HttpResponse,HttpRequest, HttpHandler, HttpEvent } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
+import {tap} from'rxjs/operators'
 
 @Injectable()
-export class Logger implements HttpInterceptor{
+export class CacheINterceptor implements HttpInterceptor{
+    // created a cache to store URL and its expiry
+    private _cache:Map<string,{expireDate:Date;response:HttpResponse<any>}> = new Map()
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        console.log(`Requested URL ${req.url}`);
-        return next.handle(req)
-        
+    
+        if(req.method !== 'GET'){
+            return next.handle(req)
+            
+        }
+        const cachedResponse=this._cache.get(req.url);
+
+        if(cachedResponse && cachedResponse.expireDate <= new Date()){
+            this._cache.delete(req.url)
+            return this._sendRequest(req,next)
+           }
+        return cachedResponse ? of(cachedResponse.response): this._sendRequest(req,next)
     }
-}
 
-
------
-
-import { Component } from '@angular/core';
-import { OrderService } from '../order.service';
-
-@Component({
-  selector: 'app-orders',
-  standalone: false,
-  templateUrl: './orders.component.html',
-  styleUrl: './orders.component.css'
-})
-export class OrdersComponent {
-
-  constructor(private ser: OrderService){
-    this.ser.loadData()
-  }
-
-}
+    private _sendRequest(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        return next.handle(req).pipe
+        (
+            tap((event) =>{
+                if(event instanceof HttpResponse){
+                    const expireDate= new Date(Date.now() + 10*1000)
+                    this._cache.set(req.url,{
+                        expireDate:expireDate,response:event
+                    })
+                }
+            })
+        )
+    }}
