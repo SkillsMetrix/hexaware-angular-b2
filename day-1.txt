@@ -1,31 +1,58 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { CartService } from '../../shared/cart.service';
 
-@Injectable({
-  providedIn: 'root',
+@Component({
+  selector: 'app-cart',
+  templateUrl: './cart.component.html',
+  styleUrl: './cart.component.css'
 })
-export class CartService {
-  public cartItemList: any = [];
-  public productList = new BehaviorSubject<any>([]);
+export class CartComponent implements OnInit {
 
-  getProducts() {
-    return this.productList.asObservable();
+  constructor(private cs:CartService){}
+  public products:any=[]
+  public grandTotal !:number
+
+  ngOnInit(): void {
+      this.cs.getProducts()
+      .subscribe(res=>{
+        this.products=res
+        this.grandTotal= this.cs.getTotalPrice()
+      })
   }
-  addToCart(product: any) {
-    this.cartItemList.push(product);
-    this.productList.next(this.cartItemList);
-    this.getTotalPrice();
-    console.log(this.cartItemList);
-  }
-  setProduct(product: any) {
-    this.cartItemList.push(...product);
-    this.productList.next(product);
-  }
-  getTotalPrice(): number {
-    let grandTotal = 0;
-    this.cartItemList.map((a: any) => {
-      grandTotal += a.total;
-    });
-    return grandTotal;
-  }
+
 }
+
+
+------------
+
+
+<ng-container>
+<div class="container">
+<div class="card-table">
+    <div class="cart-product">
+        <table class="table table-responsive">
+            <thead>
+                <tr>
+                    <th>Sr.No</th>
+                    <th>Product Name</th>
+                    <th>Product Image</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of products; let i=index">
+                    <td>{{i+1}}</td>
+                    <td>{{item.title}}</td>
+                     <td><img style="width: 120px;" src="{{item.image}}"/></td>
+                      <td style="width: 25%;">{{item.description}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+
+</ng-container>
