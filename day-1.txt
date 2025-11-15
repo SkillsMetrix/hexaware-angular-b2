@@ -1,38 +1,13 @@
-import { HttpInterceptor, HttpResponse,HttpRequest, HttpHandler, HttpEvent } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { Observable, of } from "rxjs";
-import {tap} from'rxjs/operators'
-
-@Injectable()
-export class CacheINterceptor implements HttpInterceptor{
-    // created a cache to store URL and its expiry
-    private _cache:Map<string,{expireDate:Date;response:HttpResponse<any>}> = new Map()
-
-    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    
-        if(req.method !== 'GET'){
-            return next.handle(req)
-            
-        }
-        const cachedResponse=this._cache.get(req.url);
-
-        if(cachedResponse && cachedResponse.expireDate <= new Date()){
-            this._cache.delete(req.url)
-            return this._sendRequest(req,next)
-           }
-        return cachedResponse ? of(cachedResponse.response): this._sendRequest(req,next)
-    }
-
-    private _sendRequest(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        return next.handle(req).pipe
-        (
-            tap((event) =>{
-                if(event instanceof HttpResponse){
-                    const expireDate= new Date(Date.now() + 10*1000)
-                    this._cache.set(req.url,{
-                        expireDate:expireDate,response:event
-                    })
-                }
-            })
-        )
-    }}
+<header>
+    <div class="navbar navbar-dark bg-primary shadow-sm">
+        <div class="navbar-brand align-item-center d-flex">
+            <i style="font-size: 40px;" class="fas fa-shipping-fast" >
+                &nbsp;
+            </i>
+            <strong style="font-size: 30px;">ShopCart</strong>
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="search product">
+            </div>
+        </div>
+    </div>
+</header>
