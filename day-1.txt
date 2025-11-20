@@ -1,39 +1,99 @@
-<ng-container>
-<div class="container">
-<div class="card-table">
-    <div class="cart-product">
-        <table class="table table-responsive">
-            <thead>
-                <tr>
-                    <th>Sr.No</th>
-                    <th>Product Name</th>
-                    <th>Product Image</th>
-                    <th>Description</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Total</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let item of products; let i=index">
-                    <td>{{i+1}}</td>
-                    <td>{{item.title}}</td>
-                     <td><img style="width: 120px;" src="{{item.image}}"/></td>
-                      <td style="width: 25%;">{{item.description}}</td>
-                      <th style="width: 12%;">{{item.price}}</th>
-                       <td style="width: 12%;">{{item.quantity}}</td>
-                        <td style="width: 12%;">{{item.total}}</td>
-                        <td>
-                            <button (click)="removeItem(item)" class="btn btn-danger">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+import { createReducer, on } from "@ngrx/store";
+import { Movie } from "src/app/Models/movie";
+import { getMovies } from "../Actions/movie.action";
+
+export interface MovieState{
+    movies:ReadonlyArray<Movie>
+}
+const initialState:ReadonlyArray<Movie>=[]
+
+export const movieReducer=createReducer(
+    initialState,
+    on(getMovies,(state)=>[...mockMovies()])
+)
+function mockMovies(): Movie[] {
+    const movie = new Movie(
+      'Avengers: Endgame',
+      2798,
+      new Date('26 Apr, 2019 05:30:00')
+    );
+    movie.id = 1;
+
+    const movie1 = new Movie(
+      'Avengers: Infinity War',
+      2048,
+      new Date('27 Apr, 2018 05:30:00')
+    );
+    movie1.id = 2;
+
+    const movie2 = new Movie(
+      'Age of Ultron',
+      1403,
+      new Date('01 May, 2015 05:30:00')
+    );
+    movie2.id = 3;
+
+    const movies = [movie, movie1, movie2];
+    return movies;
+  }
+--------
+
+
+
+import { Component, Input, OnInit } from '@angular/core';
+import { Movie } from '../Models/movie';
+import { DataService } from '../Service/data.service';
+import { Store } from '@ngrx/store';
+import { MovieState } from '../Store/Reducers/movie.reducer';
+
+@Component({
+  selector: 'app-movie-list',
+  templateUrl: './movie-list.component.html',
+  styleUrls: ['./movie-list.component.css'],
+})
+export class MovieListComponent implements OnInit {
+  @Input()
+  movies: Movie[] = [];
+  movies$=this.store.select('movies')
+  constructor(private dataService: DataService,private store:Store<MovieState>) {}
+
+  ngOnInit(): void {}
+}
+
+
+---------
+
+
+import { createAction } from "@ngrx/store";
+import { Movie } from "src/app/Models/movie";
+
+export const getMovies = createAction('[Movie] Loaded from services')
+
+export const getMoviesSuccess = createAction('[Movie] Loaded from services was successfull',
+    (movies:ReadonlyArray<Movie>) => ({movies})
+)
+
+export const addMovies = createAction('[Movie] added to services',
+    (movie:Movie) => ({movie})
+)
+
+export const addMovieSuccess = createAction('[Movie] addes to services success',
+    (movie:Movie) => ({movie})
+)
+
+
+--------
+
+
+<div class="movies">
+    <section *ngFor="let movie of movies$ | async">
+        <mat-card>
+            <h1> {{movie.name}} </h1>
+            <h2> {{ movie.releaseDate | date }} </h2>
+            <h3> ${{ movie.earning }} million </h3>
+        </mat-card>
+    </section>
 </div>
 
-</ng-container>
+
+---
